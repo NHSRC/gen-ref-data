@@ -1,6 +1,8 @@
 package org.nhsrc;
 
-public class MeasurableElement {
+import java.io.Serializable;
+
+public class MeasurableElement implements Serializable {
     private String name;
     private String uuid;
     private String reference;

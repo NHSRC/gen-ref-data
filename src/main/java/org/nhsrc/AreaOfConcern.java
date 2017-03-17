@@ -1,9 +1,10 @@
 package org.nhsrc;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AreaOfConcern {
+public class AreaOfConcern  implements Serializable{
     private String name;
     private String uuid;
     private String reference;

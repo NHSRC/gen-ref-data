@@ -4,6 +4,8 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -25,7 +27,8 @@ public class Create {
         currME = null;
     }
 
-    public void create(Row currentRow) {
+    public void create(Row currentRow, boolean empty) {
+
         Iterator<Cell> rowIterator = currentRow.iterator();
         List<String> cells = new ArrayList<String>();
         while (rowIterator.hasNext()) {
@@ -34,13 +37,46 @@ public class Create {
                 cells.add(cell.getStringCellValue());
             }
         }
+        boolean emptyAreasOfConcern = empty;
+        System.out.println(emptyAreasOfConcern);
         if (!cells.isEmpty()) {
+
             if (cells.get(0).startsWith("Area of Concern - ")) {
-                aoc(cells);
+                if (!emptyAreasOfConcern) {
+                    String aocRefName = cells.get(0).replace("Area of Concern - ", "");
+                    String name = aocRefName.substring(2).trim();
+                    currAOC = areasOfConcern.getAreasOfConcern().stream()
+                            .filter((aoc) -> aoc.getName().equals(name))
+                            .findFirst()
+                            .get();
+                } else {
+                    aoc(cells);
+                }
+
             } else if (cells.get(0).startsWith("Standard ")) {
-                standard(cells);
+                if (!emptyAreasOfConcern) {
+                    String name = cells.get(1).trim();
+                    currStandard = currAOC.getStandards().stream()
+                            .filter((std) -> std.getName()
+                                    .equals(name))
+                            .findFirst()
+                            .get();
+                } else {
+                    standard(cells);
+                }
+
             } else if (cells.get(0).startsWith("ME")) {
-                me(cells);
+                if (!emptyAreasOfConcern) {
+                    String name = cells.get(1).trim();
+                    currME = currStandard.getMeasurableElements().stream().filter((me) -> me.getName().equals(name)).findFirst().get();
+                    if ((cells.size() > 2 && cells.get(2).trim().length() > 0)) {
+                        checkpoint(cells.subList(2, cells.size()));
+                    }
+
+                } else {
+                    me(cells);
+                }
+
             } else {
                 checkpoint(cells);
             }

@@ -1,9 +1,10 @@
 package org.nhsrc;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AreasOfConcern {
+public class AreasOfConcern implements Serializable{
     private List<AreaOfConcern> areasOfConcern;
 
     public AreasOfConcern() {
@@ -20,6 +21,10 @@ public class AreasOfConcern {
 
     public void addAreasOfConcern(AreaOfConcern areaOfConcern) {
         this.areasOfConcern.add(areaOfConcern);
+    }
+
+    public boolean isEmpty() {
+        return this.areasOfConcern.isEmpty();
     }
 
     @Override
