@@ -12,15 +12,18 @@ import java.util.Iterator;
 
 public class Main {
 
-    private static String pathname = "/Users/vinay/items/NQAS_DH_LABOUR_ROOM_CLEAN.xlsx";
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
+        String dirPath = args[0];
+        String inputFileName = args[1];
+        String outputFileName = inputFileName.replace(".xlsx", ".json");
+        String outputCheckpointFileName = inputFileName.replace(".xlsx", "_checkpoints.json");
         FileInputStream inputStream = new FileInputStream(
-                new File(pathname));
+                new File(dirPath + "/" + inputFileName));
         XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
         XSSFSheet sheet = workbook.getSheetAt(0);
         Iterator<Row> iterator = sheet.iterator();
-        String output = "/Users/vinay/items/output/aoc.ser";
+        String output = dirPath + "/aoc.ser";
         AreasOfConcern areasOfConcern = readAreasOfConcern(output);
         boolean empty = areasOfConcern.isEmpty();
         Checkpoints checkpoints = new Checkpoints();
@@ -31,8 +34,8 @@ public class Main {
         }
         Gson gson = new Gson();
         writeAOCs(output, areasOfConcern);
-        Files.write(Paths.get("/Users/vinay/items/NQAS_DH_LABOUR_ROOM.json"), gson.toJson(areasOfConcern.getAreasOfConcern()).getBytes());
-        Files.write(Paths.get("/Users/vinay/items/NQAS_DH_LABOUR_ROOM_CLEAN_CHECKPOINTS.json"), gson.toJson(checkpoints.getCheckpoints()).getBytes());
+        Files.write(Paths.get(dirPath + "/" + outputFileName), gson.toJson(areasOfConcern.getAreasOfConcern()).getBytes());
+        Files.write(Paths.get(dirPath + "/" + outputCheckpointFileName), gson.toJson(checkpoints.getCheckpoints()).getBytes());
         for (AreaOfConcern areaOfConcern : areasOfConcern.getAreasOfConcern()) {
             System.out.println("\"" + areaOfConcern.getUuid() + "\",");
         }
@@ -48,10 +51,9 @@ public class Main {
         } catch (IOException e) {
             return new AreasOfConcern();
         } finally {
-            try  {
+            try {
                 objectInputStream.close();
-            }
-            catch (Exception e){
+            } catch (Exception e) {
 
             }
 
