@@ -1,9 +1,10 @@
-package org.nhsrc;
+package org.nhsrc.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Checkpoints {
+public class Checkpoints implements Serializable {
     private List<Checkpoint> checkpoints;
 
     public List<Checkpoint> getCheckpoints() {

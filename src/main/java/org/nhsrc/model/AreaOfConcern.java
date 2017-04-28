@@ -1,17 +1,17 @@
-package org.nhsrc;
+package org.nhsrc.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Standard implements Serializable{
+public class AreaOfConcern implements Serializable {
     private String name;
     private String uuid;
     private String reference;
-    private List<MeasurableElement> measurableElements;
+    private List<Standard> standards;
 
-    public Standard() {
-        this.measurableElements = new ArrayList<MeasurableElement>();
+    public AreaOfConcern() {
+        this.standards = new ArrayList<Standard>();
     }
 
     public String getName() {
@@ -38,24 +38,25 @@ public class Standard implements Serializable{
         this.reference = reference;
     }
 
-    public List<MeasurableElement> getMeasurableElements() {
-        return measurableElements;
+    public List<Standard> getStandards() {
+        return standards;
     }
 
-    public void setMeasurableElements(List<MeasurableElement> measurableElements) {
-        this.measurableElements = measurableElements;
+    public void setStandards(List<Standard> standards) {
+        this.standards = standards;
     }
 
-    public void addMeasurableElement(MeasurableElement measurableElement) {
-        this.measurableElements.add(measurableElement);
+    public void addStandard(Standard standard) {
+        this.standards.add(standard);
     }
 
     @Override
     public String toString() {
-        return "Standard{" +
+        return "AreaOfConcern{" +
                 "name='" + name + '\'' +
                 ", uuid='" + uuid + '\'' +
                 ", reference='" + reference + '\'' +
+                ", standards='" + standards + '\'' +
                 '}';
     }
 }

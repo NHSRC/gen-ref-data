@@ -1,11 +1,10 @@
-package org.nhsrc;
+package org.nhsrc.model;
 
 import java.io.Serializable;
 
-public class MeasurableElement implements Serializable {
+public class Department implements Serializable {
     private String name;
     private String uuid;
-    private String reference;
 
     public String getName() {
         return name;
@@ -21,13 +20,5 @@ public class MeasurableElement implements Serializable {
 
     public void setUuid(String uuid) {
         this.uuid = uuid;
-    }
-
-    public String getReference() {
-        return reference;
-    }
-
-    public void setReference(String reference) {
-        this.reference = reference;
     }
 }

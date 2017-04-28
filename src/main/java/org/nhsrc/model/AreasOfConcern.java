@@ -1,4 +1,4 @@
-package org.nhsrc;
+package org.nhsrc.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;

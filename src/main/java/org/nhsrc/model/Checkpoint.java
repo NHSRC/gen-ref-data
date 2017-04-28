@@ -1,6 +1,9 @@
-package org.nhsrc;
+package org.nhsrc.model;
 
-public class Checkpoint {
+import java.io.Serializable;
+import java.util.List;
+
+public class Checkpoint implements Serializable {
     private String name;
     private String uuid;
     private String meansOfVerification = "";
@@ -100,4 +103,9 @@ public class Checkpoint {
     public void setAmRecordReview(Boolean amRecordReview) {
         this.amRecordReview = amRecordReview;
     }
+
+    public Boolean isOfType(List<String> content) {
+        return null;
+    }
+
 }

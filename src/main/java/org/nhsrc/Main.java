@@ -4,66 +4,81 @@ import com.google.gson.Gson;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.nhsrc.model.*;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Iterator;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class Main {
+
+    private static AreasOfConcern areasOfConcern = new AreasOfConcern();
+    private static Checkpoints checkpoints = new Checkpoints();
+    private static Departments departments = new Departments();
 
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
         String dirPath = args[0];
-        String inputFileName = args[1];
-        String outputFileName = inputFileName.replace(".xlsx", ".json");
-        String outputCheckpointFileName = inputFileName.replace(".xlsx", "_checkpoints.json");
+        String assessmentTool = args[1];
+        File[] files = new File(dirPath).listFiles((dir, name) -> name.endsWith(".xlsx") && !name.startsWith("~$"));
+        Checklists checklists = new Checklists();
+        for (File file : files) {
+            String checklistUUID = UUID.randomUUID().toString();
+            System.out.println("Checklist UUID - " + checklistUUID);
+            System.out.println(file.getName());
+            Checklist checklist = fileImport(file.getName(), dirPath, checklistUUID, assessmentTool);
+            checklists.add(checklist);
+        }
+        Gson gson = new Gson();
+        Files.write(Paths.get(dirPath + "/" + "areasOfConcern.json"), gson.toJson(Main.areasOfConcern.getAreasOfConcern()).getBytes());
+        Files.write(Paths.get(dirPath + "/" + "checkpoints.json"), gson.toJson(Main.checkpoints.getCheckpoints()).getBytes());
+        Files.write(Paths.get(dirPath + "/" + "checklists.json"), gson.toJson(checklists.getChecklists()).getBytes());
+        Files.write(Paths.get(dirPath + "/" + "departments.json"), gson.toJson(departments.getDepartments()).getBytes());
+    }
+
+    private static Checklist fileImport(String inputFileName, String dirPath, String checklistUUID, String assessmentTool) throws IOException, ClassNotFoundException {
+
         FileInputStream inputStream = new FileInputStream(
                 new File(dirPath + "/" + inputFileName));
         XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
         XSSFSheet sheet = workbook.getSheetAt(0);
         Iterator<Row> iterator = sheet.iterator();
-        String output = dirPath + "/aoc.ser";
-        AreasOfConcern areasOfConcern = readAreasOfConcern(output);
         boolean empty = areasOfConcern.isEmpty();
-        Checkpoints checkpoints = new Checkpoints();
-        Create create = new Create(areasOfConcern, checkpoints);
+        Checklist checklist = new Checklist();
+        Create create = new Create(areasOfConcern, checkpoints, checklistUUID);
         while (iterator.hasNext()) {
             Row currentRow = iterator.next();
             create.create(currentRow, empty);
         }
-        Gson gson = new Gson();
-        writeAOCs(output, areasOfConcern);
-        Files.write(Paths.get(dirPath + "/" + outputFileName), gson.toJson(areasOfConcern.getAreasOfConcern()).getBytes());
-        Files.write(Paths.get(dirPath + "/" + outputCheckpointFileName), gson.toJson(checkpoints.getCheckpoints()).getBytes());
         for (AreaOfConcern areaOfConcern : areasOfConcern.getAreasOfConcern()) {
             System.out.println("\"" + areaOfConcern.getUuid() + "\",");
         }
+        checklist.setAreasOfConcern(
+                areasOfConcern
+                        .getAreasOfConcern()
+                        .stream()
+                        .map(AreaOfConcern::getUuid)
+                        .collect(Collectors.toList()));
+        checklist.setAssessmentTool(assessmentTool);
+        checklist.setUuid(checklistUUID);
+        Department department = Main.makeDepartment(sheet.getSheetName());
+        checklist.setDepartment(department.getUuid());
+        checklist.setName(department.getName());
         workbook.close();
         inputStream.close();
+        return checklist;
     }
 
-    private static AreasOfConcern readAreasOfConcern(String s) throws ClassNotFoundException, IOException {
-        ObjectInputStream objectInputStream = null;
-        try {
-            objectInputStream = new ObjectInputStream(new FileInputStream(new File(s)));
-            return (AreasOfConcern) objectInputStream.readObject();
-        } catch (IOException e) {
-            return new AreasOfConcern();
-        } finally {
-            try {
-                objectInputStream.close();
-            } catch (Exception e) {
-
-            }
-
-        }
-    }
-
-    private static void writeAOCs(String s, Object o) throws IOException {
-        FileOutputStream fos = new FileOutputStream(s);
-        ObjectOutputStream oos = new ObjectOutputStream(fos);
-        oos.writeObject(o);
-        oos.close();
+    private static Department makeDepartment(String name) {
+        Department department = new Department();
+        department.setUuid(UUID.randomUUID().toString());
+        department.setName(name);
+        departments.addDepartment(department);
+        return department;
     }
 }
